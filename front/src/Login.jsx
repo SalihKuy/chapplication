@@ -1,0 +1,86 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+function Login() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (localStorage.getItem("token")) {
+            axios.get("https://localhost:7141/Auth/ValidateToken", {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            .then(response => {
+                if (response.data.success === true) {
+                    console.log("Token is valid:", response.data);
+                    navigate("/Interface");
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            }
+            );
+        }
+    }, [navigate]);
+
+    function handleLogin(e) {
+        e.preventDefault();
+        axios.post("https://localhost:7141/Auth/Login", {
+            Email: email,
+            password: password
+        })
+        .then(response => {
+            if (response.data.success === true) {
+                console.log("Login successful:", response.data.data);
+                localStorage.setItem("token", response.data.data.token);
+                localStorage.setItem("id", response.data.data.id);
+                navigate("/Interface");
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            if (error.response) {
+                if (error.response.status === 400) {
+                    if (error.response.data.message === "User not found." || error.response.data.message === "Wrong password.") {
+                        setErrorMessage("Invalid email or password");
+                    }
+                }
+            }
+        });
+    }
+
+    return (
+        <>
+            <div style={{display:"grid", gridTemplateRows: "repeat(10, 1fr)", gridTemplateColumns: "repeat(15, 1fr)", height: "100vh", width: "100vw", backgroundColor:"#333333"}}>
+                <div style={{display:"flex", flexDirection:"column", gridColumnStart: "4", gridColumnEnd: "8", gridRowStart: "2", gridRowEnd: "10", backgroundColor: "#444444", borderRadius:"5%"}}>
+                    <div style={{flex:"2", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
+                    <p style={{flex:"1", textAlign:"center",  fontSize:"2em", color:"#FFFFFF"}}>Login</p>
+                    <form style={{flex:"10", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center"}} onSubmit={handleLogin}>
+                        <div style={{flex:"1", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
+                        <input onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email" style={{flex:"0.7", margin:"10px", width:"200px", height:"30px", backgroundColor:"#222222", color:"#DDDDDD"}}></input>
+                        <div style={{flex:"0.3", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
+                        <input onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Password" style={{flex:"0.7", margin:"10px", width:"200px", height:"30px", backgroundColor:"#222222", color:"#DDDDDD"}}></input>
+                        <div style={{flex:"0.3", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
+                        <button type="submit" style={{width:"200px", height:"30px", borderRadius:"15px", backgroundColor:"#111111", color:"#DDDDDD", flex:"0.6"}}>Login</button>
+                        <div style={{flex:"0.1", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
+                        <div style={{display:"flex", flexDirection:"column", flex:"3"}}>
+                            <div style={{display:"flex", alignItems:"center", justifyContent:"center", width:"100%", flex:"3"}}>
+                                <p style={{margin:"0", marginRight:"5px", marginTop:"5px", color:"#EEEEEE"}}>Don&apos;t have an account?</p>
+                                <a href="/register" style={{textDecoration: "none", marginTop:"5px", color:"#301934"}}>Register</a>
+                            </div>
+                            <div style={{flex:"10", justifyContent:"center", alignItems:"center"}}></div>
+                        </div>
+                        {errorMessage && <p style={{flex:"2", color:"red"}}>{errorMessage}</p>}
+                    </form>
+                </div>
+            </div>
+        </>
+    );
+}
+
+export default Login;
