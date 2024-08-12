@@ -23,13 +23,6 @@ namespace back.Services.UserService
             _context = context;
             _mapper = mapper;
         }
-        public async Task<ServiceResponse<List<GetUserDto>>> GetAllUsers()
-        {
-            var response = new ServiceResponse<List<GetUserDto>>();
-            var dbUsers = await _context.Users.ToListAsync();
-            response.Data = dbUsers.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
-            return response;
-        }
         public async Task<ServiceResponse<GetUserDto>> GetUser(int id)
         {
             var user = await _context.Users
@@ -84,49 +77,6 @@ namespace back.Services.UserService
             {
                 Data = _mapper.Map<GetUserDto>(user)
             };
-            return response;
-        }
-        public async Task<ServiceResponse<GetUserDto>> UpdateUser(UpdateUserDto updatedUser)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == updatedUser.Id);
-            if (user == null)
-            {
-                return new ServiceResponse<GetUserDto>
-                {
-                    Success = false,
-                    Message = "User not found"
-                };
-            }
-            user.Name = updatedUser.Name;
-            user.Email = updatedUser.Email;
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
-            {
-                user.Hash = hmac.Key;
-                user.Salt = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(updatedUser.Password));
-            }
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-            var response = new ServiceResponse<GetUserDto>
-            {
-                Data = _mapper.Map<GetUserDto>(user)
-            };
-            return response;
-        }
-        public async Task<ServiceResponse<List<GetUserDto>>> DeleteUser(int id)
-        {
-            var response = new ServiceResponse<List<GetUserDto>>();
-            try
-            {
-                User user = await _context.Users.FirstAsync(u => u.Id == id);
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
-                response.Data = _context.Users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
-            }
-            catch (Exception ex)
-            {
-                response.Success = false;
-                response.Message = ex.Message;
-            }
             return response;
         }
     }

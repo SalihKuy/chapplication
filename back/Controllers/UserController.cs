@@ -22,13 +22,6 @@ namespace back.Controllers
         {
             _userService = userService;
         }
-        [HttpGet]
-        public Task<ServiceResponse<List<GetUserDto>>> GetAllUsers()
-        {
-            Console.WriteLine("Getting all users");
-            return _userService.GetAllUsers();
-        }
-
         [HttpGet("{id}")]
         public Task<ServiceResponse<GetUserDto>> GetUser(int id)
         {
@@ -49,18 +42,5 @@ namespace back.Controllers
             Console.WriteLine("Adding user");
             return _userService.AddUser(newUser);
         }
-        [HttpPut]
-        public Task<ServiceResponse<GetUserDto>> UpdateUser(UpdateUserDto updatedUser)
-        {
-            Console.WriteLine("Updating user");
-            return _userService.UpdateUser(updatedUser);
-        }
-        [HttpDelete("{id}")]
-        public Task<ServiceResponse<List<GetUserDto>>> DeleteUser(int id)
-        {
-            Console.WriteLine("Deleting user");
-            return _userService.DeleteUser(id);
-        }
-
     }
 }
