@@ -17,7 +17,7 @@ function Login() {
             return;
         }
     
-        axios.post("https://localhost:7141/Auth/Register", {
+        axios.post("https://dockerchat-production.up.railway.app/Auth/Register", {
             Name: username,
             Email: email,
             Password: password

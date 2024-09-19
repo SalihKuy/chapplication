@@ -5987,11 +5987,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/cannx/Downloads/hehehe/back/back.csproj",
+      "projectUniqueName": "/Users/cannx/Downloads/chapplication/back/back.csproj",
       "projectName": "back",
-      "projectPath": "/Users/cannx/Downloads/hehehe/back/back.csproj",
+      "projectPath": "/Users/cannx/Downloads/chapplication/back/back.csproj",
       "packagesPath": "/Users/cannx/.nuget/packages/",
-      "outputPath": "/Users/cannx/Downloads/hehehe/back/obj/",
+      "outputPath": "/Users/cannx/Downloads/chapplication/back/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/cannx/.nuget/NuGet/NuGet.Config"

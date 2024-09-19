@@ -44,7 +44,11 @@ namespace back.Data
             CreatePasswordHash(password, out byte[] hash, out byte[] salt);
             user.Hash = hash;
             user.Salt = salt;
-            user.Id = await _context.Users.MaxAsync(u => u.Id) + 1;
+            var userIds = await _context.Users.Select(u => u.Id).ToListAsync();
+
+            int newId = (userIds.DefaultIfEmpty(0).Max()) + 1;
+
+            user.Id = newId;
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return response;
@@ -101,20 +105,30 @@ namespace back.Data
 
         public async Task<bool> UserEmailExists(string email)
         {
-            if (await _context.Users.AnyAsync(u => u.Email.ToLower().Equals(email.ToLower())))
+            try
             {
-                return true;
+                return await _context.Users
+                    .AnyAsync(u => u.Email.ToLower().Equals(email.ToLower()));
             }
-            return false;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error querying UserEmailExists: {ex.Message}");
+                return false;
+            }
         }
 
         public async Task<bool> UserNameExists(string name)
         {
-            if (await _context.Users.AnyAsync(u => u.Name.ToLower().Equals(name.ToLower())))
+            try
             {
-                return true;
+                return await _context.Users
+                    .AnyAsync(u => u.Name.ToLower().Equals(name.ToLower()));
             }
-            return false;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error querying UserNameExists: {ex.Message}");
+                return false;
+            }
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

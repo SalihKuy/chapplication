@@ -111,7 +111,15 @@ namespace back.Services.MessageService
                 User = user
             };
             Console.WriteLine("message userid: " + message.UserId);
-            message.Id = _context.Messages.OrderBy(m => m.Id).Last().Id + 1;
+            var msgs = await _context.Messages.ToListAsync();
+            if (msgs.Count == 0)
+            {
+                message.Id = 1;
+            }
+            else
+            {
+                message.Id = msgs.OrderBy(m => m.Id).Last().Id + 1;
+            }
             ch.Messages.Add(message);
             Console.WriteLine("UserId before SaveChanges: " + message.UserId);
             await _context.SaveChangesAsync();

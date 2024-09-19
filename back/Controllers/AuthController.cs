@@ -37,17 +37,26 @@ namespace back.Controllers
             {
                 return BadRequest(response);
             }
-            return Ok(response); 
+            return Ok(response);
         }
         [HttpPost("Login")]
         public async Task<ActionResult<ServiceResponse<GetUserDto>>> Login(UserLoginDto request)
         {
-            var response = await _authRepository.Login(request.Email, request.Password);
-            if (!response.Success)
+            try
             {
-                return BadRequest(response);
+                var response = await _authRepository.Login(request.Email, request.Password);
+                if (!response.Success)
+                {
+                    return BadRequest(response);
+                }
+                return Ok(response);
             }
-            return Ok(response); 
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Login error: {ex}");
+                return StatusCode(500, "An error occurred during login");
+            }
+
         }
     }
 }

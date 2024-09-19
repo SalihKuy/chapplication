@@ -31,7 +31,7 @@ function Interface() {
         console.log("getting user");
         console.log("User ID: ", localStorage.getItem("id"));
         const userId = localStorage.getItem("id");
-        const response = await axios.get(`https://localhost:7141/api/User/${userId}`, {
+        const response = await axios.get(`https://dockerchat-production.up.railway.app/api/User/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
           }
@@ -92,7 +92,7 @@ function Interface() {
         console.log("getting user");
         console.log("User ID: ", localStorage.getItem("id"));
         const userId = localStorage.getItem("id");
-        const response = await axios.get(`https://localhost:7141/api/User/${userId}`, {
+        const response = await axios.get(`https://dockerchat-production.up.railway.app/api/User/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
           }
@@ -119,7 +119,7 @@ function Interface() {
     }
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7141/chathub")
+      .withUrl("https://dockerchat-production.up.railway.app/chathub")
       .withAutomaticReconnect()
       .build();
 
@@ -298,7 +298,7 @@ function Interface() {
     console.log("UserID: ", userId);
     console.log("Getting chat for user:", userRef.current);
 
-    axios.post(`https://localhost:7141/api/Chat?userId=${userId}`)
+    axios.post(`https://dockerchat-production.up.railway.app/api/Chat?userId=${userId}`)
       .then(response => {
         console.log("Matched chat:", response.data);
         if (response.data && response.data.success) {
@@ -341,7 +341,7 @@ function Interface() {
     console.log(userRef.current);
     const newMessage = { Content: messageInput, ChatId: activeChat.id, UserId: userRef.current.id };
     console.log(newMessage);
-    axios.post("https://localhost:7141/api/Message", newMessage)
+    axios.post("https://dockerchat-production.up.railway.app/api/Message", newMessage)
       .then(response => {
         console.log("Message sent:", response.data);
         console.log(activeChat);
@@ -372,7 +372,7 @@ function Interface() {
 
     previousScrollHeightRef.current = chatContainerRef.current.scrollHeight;
 
-    axios.get("https://localhost:7141/api/Message", { params: { id: activeChat.recentMessages[0].id - 1, chatId: activeChat.id, userId: userRef.current.id } })
+    axios.get("https://dockerchat-production.up.railway.app/api/Message", { params: { id: activeChat.recentMessages[0].id - 1, chatId: activeChat.id, userId: userRef.current.id } })
       .then(response => {
         console.log(activeChat);
         if (response.data.data.recentMessages.length === 0) {
@@ -402,7 +402,7 @@ function Interface() {
   }
 
   function handleLeave(id) {
-    axios.delete(`https://localhost:7141/api/Chat/${id}`).then(response => {
+    axios.delete(`https://dockerchat-production.up.railway.app/api/Chat/${id}`).then(response => {
       if (response.data.success) {
         console.log("Left chat:", id);
         let updatedChats = userRef.current.chats.filter(chat => chat.id !== id);

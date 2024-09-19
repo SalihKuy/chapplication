@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "chehxs5USVUmVacdwDAF1LRDFIAm207fYu8EF99D8NT6AhHyTVvr9C7y371J4p0PzAqwf+YesQQy5p3o1dyFOw==",
+  "dgSpecHash": "G7HbfSynYiGqQfc1uV9nnK9j61cIMrzi8a+Bu2fUP7KUvumwYpmulY27Z936Hs4xa/S2p8S0ZyWURUXqkSFdTA==",
   "success": true,
-  "projectFilePath": "/Users/cannx/Downloads/hehehe/back/back.csproj",
+  "projectFilePath": "/Users/cannx/Downloads/chapplication/back/back.csproj",
   "expectedPackageFiles": [
     "/Users/cannx/.nuget/packages/automapper/13.0.1/automapper.13.0.1.nupkg.sha512",
     "/Users/cannx/.nuget/packages/azure.core/1.35.0/azure.core.1.35.0.nupkg.sha512",
