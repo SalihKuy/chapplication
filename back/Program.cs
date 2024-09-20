@@ -64,7 +64,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddSignalR(options =>
 {
     options.KeepAliveInterval = TimeSpan.FromSeconds(10);
-    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30); // Ensure this is greater than KeepAliveInterval
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
 })
 .AddJsonProtocol(options =>
 {
