@@ -30,6 +30,8 @@ namespace back.Controllers
         [HttpGet("verify-email")]
         public async Task<ActionResult<ServiceResponse<bool>>> VerifyEmail([FromQuery] string token)
         {
+            Console.WriteLine("Got the verify email request");
+            Console.WriteLine($"Token: {token}");
             var result = await _authRepository.VerifyEmail(token);
             if (!result.Success)
             {
@@ -37,7 +39,6 @@ namespace back.Controllers
             }
             return Ok(result);
         }
-
         [HttpPost("Register")]
         public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegisterDto request)
         {
