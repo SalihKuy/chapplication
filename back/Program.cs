@@ -9,6 +9,7 @@ using back.Models;
 using back.Services.UserService;
 using back.Services.ChatService;
 using back.Services.MessageService;
+using back.Services.EmailAuthService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Filters;
@@ -22,7 +23,8 @@ using System.Text.Json.Serialization;
 
 Console.WriteLine("Creating builder");
 var builder = WebApplication.CreateBuilder(args);
-
+Console.WriteLine("Adding Configuration");
+builder.Configuration.AddEnvironmentVariables();
 Console.WriteLine("Adding Controllers");
 builder.Services.AddControllers();
 Console.WriteLine("Adding EndpointsApiExplorer");
@@ -43,7 +45,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost", builder =>
     {
-        builder.WithOrigins("https://skibidituvalet.netlify.app")
+        builder.WithOrigins("https://chapplication.netlify.app")
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
@@ -60,6 +62,8 @@ Console.WriteLine("Adding Message Service");
 builder.Services.AddScoped<IMessageService, MessageService>();
 Console.WriteLine("Adding Auth Repository");
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+Console.WriteLine("Adding Email Auth Service");
+builder.Services.AddScoped<IEmailAuthService, EmailAuthService>();
 Console.WriteLine("Adding DBContext");
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

@@ -13,5 +13,6 @@ namespace back.Data
         Task<ServiceResponse<GetUserDto>> Login(string email, string password);
         Task<bool> UserEmailExists(string email);
         Task<bool> UserNameExists(string name);
+        Task<ServiceResponse<bool>> VerifyEmail(string token);
     }
 }

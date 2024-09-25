@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/cannx/Downloads/chapplication/back/back.csproj": {}
+    "/Users/cannx/Downloads/chapplicationdocker/back/back.csproj": {}
   },
   "projects": {
-    "/Users/cannx/Downloads/chapplication/back/back.csproj": {
+    "/Users/cannx/Downloads/chapplicationdocker/back/back.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/cannx/Downloads/chapplication/back/back.csproj",
+        "projectUniqueName": "/Users/cannx/Downloads/chapplicationdocker/back/back.csproj",
         "projectName": "back",
-        "projectPath": "/Users/cannx/Downloads/chapplication/back/back.csproj",
+        "projectPath": "/Users/cannx/Downloads/chapplicationdocker/back/back.csproj",
         "packagesPath": "/Users/cannx/.nuget/packages/",
-        "outputPath": "/Users/cannx/Downloads/chapplication/back/obj/",
+        "outputPath": "/Users/cannx/Downloads/chapplicationdocker/back/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/cannx/.nuget/NuGet/NuGet.Config"
@@ -20,6 +20,7 @@
           "net8.0"
         ],
         "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -41,6 +42,14 @@
             "AutoMapper": {
               "target": "Package",
               "version": "[13.0.1, )"
+            },
+            "Google.Apis.Auth": {
+              "target": "Package",
+              "version": "[1.68.0, )"
+            },
+            "Google.Apis.Gmail.v1": {
+              "target": "Package",
+              "version": "[1.68.0.3427, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",

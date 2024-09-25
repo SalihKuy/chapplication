@@ -27,6 +27,17 @@ namespace back.Controllers
         {
             return Ok(new { success = true });
         }
+        [HttpGet("verify-email")]
+        public async Task<ActionResult<ServiceResponse<bool>>> VerifyEmail([FromQuery] string token)
+        {
+            var result = await _authRepository.VerifyEmail(token);
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         [HttpPost("Register")]
         public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegisterDto request)
         {

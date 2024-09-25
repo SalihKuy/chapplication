@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using back.Dtos.Chat;
 using back.Dtos.Message;
+using back.Services.EmailAuthService;
 
 namespace back.Data
 {
@@ -17,11 +18,12 @@ namespace back.Data
     {
         private readonly ApplicationDBContext _context;
         private readonly IConfiguration _configuration;
-        public AuthRepository(ApplicationDBContext context, IConfiguration configuration)
+        private readonly IEmailAuthService _emailAuthService;
+        public AuthRepository(ApplicationDBContext context, IConfiguration configuration, IEmailAuthService emailAuthService)
         {
             _context = context;
             _configuration = configuration;
-
+            _emailAuthService = emailAuthService;
         }
         public async Task<ServiceResponse<int>> Register(User user, string password)
         {
@@ -46,11 +48,65 @@ namespace back.Data
             user.Salt = salt;
             var userIds = await _context.Users.Select(u => u.Id).ToListAsync();
 
+            user.VerificationToken = _emailAuthService.GenerateRandomString();
+            user.TokenCreationTime = DateTime.UtcNow;
+            user.EmailConfirmed = false;
+
+            bool emailSent = _emailAuthService.SendVerificationEmail(user.Email, user.VerificationToken);
+
+            if (emailSent)
+            {
+                response.Success = true;
+                response.Data = user.Id;
+                response.Message = "Registration successful. Please check your email to verify your account.";
+            }
+            else
+            {
+                response.Success = false;
+                response.Message = "Registration successful, but failed to send verification email. Please contact support.";
+            }
+
             int newId = (userIds.DefaultIfEmpty(0).Max()) + 1;
 
             user.Id = newId;
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+            return response;
+        }
+
+        public async Task<ServiceResponse<bool>> VerifyEmail(string token)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
+            var response = new ServiceResponse<bool>();
+
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "Invalid token.";
+                return response;
+            }
+
+            if (user.EmailConfirmed)
+            {
+                response.Success = false;
+                response.Message = "Email already verified.";
+                return response;
+            }
+
+            if ((DateTime.UtcNow - user.TokenCreationTime).TotalHours > 24)
+            {
+                response.Success = false;
+                response.Message = "Token has expired.";
+                return response;
+            }
+
+            user.EmailConfirmed = true;
+            user.VerificationToken = null;
+            await _context.SaveChangesAsync();
+
+            response.Success = true;
+            response.Data = true;
+            response.Message = "Email verified successfully.";
             return response;
         }
 
