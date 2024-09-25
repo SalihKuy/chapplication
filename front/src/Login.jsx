@@ -49,6 +49,9 @@ function Login() {
                     if (error.response.data.message === "User not found." || error.response.data.message === "Wrong password.") {
                         setErrorMessage("Invalid email or password");
                     }
+                    else if(error.response.data.message === "Email not verified. Please check your email for the verification link.") {
+                        setErrorMessage(error.response.data.message);
+                    }
                 }
             }
         });

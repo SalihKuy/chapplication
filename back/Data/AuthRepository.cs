@@ -130,6 +130,12 @@ namespace back.Data
                 response.Message = "Wrong password.";
                 return response;
             }
+            else if (!user.EmailConfirmed)
+            {
+                response.Success = false;
+                response.Message = "Email not verified. Please check your email for the verification link.";
+                return response;
+            }
 
             var userDto = new GetUserDto
             {
