@@ -66,6 +66,7 @@ function Login() {
                             </div>
                             <div style={{ flex: "10", justifyContent: "center", alignItems: "center" }}></div>
                         </div>
+                        <p style={{flex:"2", color: "#FFFFFF" }}>Please check your email&apos;s spam folder after registering.</p>
                         {errorMessage && <p style={{flex:"2", color: "red" }}>{errorMessage}</p>}
                     </form>
                 </div>
