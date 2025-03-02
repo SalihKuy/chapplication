@@ -10,7 +10,7 @@ function Login() {
 
     useEffect(() => {
         if (localStorage.getItem("token")) {
-            axios.get("https://dockerchat-production.up.railway.app/Auth/ValidateToken", {
+            axios.get("https://dockample-courageerchat-production.up.railway.app/Auth/ValidateToken", {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -30,7 +30,7 @@ function Login() {
 
     function handleLogin(e) {
         e.preventDefault();
-        axios.post("https://dockerchat-production.up.railway.app/Auth/Login", {
+        axios.post("https://ample-courage-production.up.railway.app/Auth/Login", {
             Email: email,
             password: password
         })
