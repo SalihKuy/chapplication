@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import API_BASE_URL from "./config.js";
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +19,7 @@ const VerifyEmail = () => {
     console.log("Starting email verification with token:", token);
     try {
       console.log("Making fetch request to backend...");
-      const response = await fetch(`https://d1acbf1a110a.ngrok-free.app/Auth/verify-email?token=${token}`);
+      const response = await fetch(`${API_BASE_URL}/Auth/verify-email?token=${token}`);
       console.log("Response received:", response);
       console.log("Response status:", response.status);
       

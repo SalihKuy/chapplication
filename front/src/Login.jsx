@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "./config.js";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -10,7 +11,7 @@ function Login() {
 
     useEffect(() => {
         if (localStorage.getItem("token")) {
-            axios.get("https://d1acbf1a110a.ngrok-free.app/Auth/ValidateToken", {
+            axios.get(`${API_BASE_URL}/Auth/ValidateToken`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -30,7 +31,7 @@ function Login() {
 
     function handleLogin(e) {
         e.preventDefault();
-        axios.post("https://d1acbf1a110a.ngrok-free.app/Auth/Login", {
+        axios.post(`${API_BASE_URL}/Auth/Login`, {
             Email: email,
             password: password
         })

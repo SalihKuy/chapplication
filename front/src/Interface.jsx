@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PropTypes from "prop-types";
 import logoutImg from "./assets/logout.png";
+import API_BASE_URL from "./config.js";
 
 function Interface() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,7 +32,7 @@ function Interface() {
         console.log("getting user");
         console.log("User ID: ", localStorage.getItem("id"));
         const userId = localStorage.getItem("id");
-        const response = await axios.get(`https://d1acbf1a110a.ngrok-free.app/api/User/${userId}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/User/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
           }
@@ -74,7 +75,7 @@ function Interface() {
 
   const startSignalRConnection = useCallback(async () => {
     try {
-      console.log("startSignalRConnection:" + connection)
+      console.log("startSignalRConnection:" + connection);
       if (connection) {
         await connection.start();
         console.log("SignalR Connected");
@@ -92,7 +93,7 @@ function Interface() {
         console.log("getting user");
         console.log("User ID: ", localStorage.getItem("id"));
         const userId = localStorage.getItem("id");
-        const response = await axios.get(`https://d1acbf1a110a.ngrok-free.app/api/User/${userId}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/User/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
           }
@@ -119,7 +120,7 @@ function Interface() {
     }
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://d1acbf1a110a.ngrok-free.app/chathub")
+      .withUrl(`${API_BASE_URL}/chathub`)
       .withAutomaticReconnect()
       .build();
 
@@ -298,7 +299,7 @@ function Interface() {
     console.log("UserID: ", userId);
     console.log("Getting chat for user:", userRef.current);
 
-    axios.post(`https://d1acbf1a110a.ngrok-free.app/api/Chat?userId=${userId}`)
+    axios.post(`${API_BASE_URL}/api/Chat?userId=${userId}`)
       .then(response => {
         console.log("Matched chat:", response.data);
         if (response.data && response.data.Success) {
@@ -328,7 +329,7 @@ function Interface() {
       const bLastMsgTime = b.recentMessages.length > 0 ? new Date(b.recentMessages[b.recentMessages.length - 1].date) : new Date(0);
       return bLastMsgTime - aLastMsgTime;
     });
-    return sortedChats
+    return sortedChats;
   }
 
   function handleSend(e) {
@@ -341,7 +342,7 @@ function Interface() {
     console.log(userRef.current);
     const newMessage = { Content: messageInput, ChatId: activeChat.id, UserId: userRef.current.id };
     console.log(newMessage);
-    axios.post("https://d1acbf1a110a.ngrok-free.app/api/Message", newMessage)
+    axios.post(`${API_BASE_URL}/api/Message`, newMessage)
       .then(response => {
         console.log("Message sent:", response.data);
         console.log(activeChat);
@@ -372,7 +373,7 @@ function Interface() {
 
     previousScrollHeightRef.current = chatContainerRef.current.scrollHeight;
 
-    axios.get("https://d1acbf1a110a.ngrok-free.app/api/Message", { params: { id: activeChat.recentMessages[0].id - 1, chatId: activeChat.id, userId: userRef.current.id } })
+    axios.get(`${API_BASE_URL}/api/Message`, { params: { id: activeChat.recentMessages[0].id - 1, chatId: activeChat.id, userId: userRef.current.id } })
       .then(response => {
         console.log(activeChat);
         if (response.data.Data.recentMessages.length === 0) {
@@ -402,7 +403,7 @@ function Interface() {
   }
 
   function handleLeave(id) {
-    axios.delete(`https://d1acbf1a110a.ngrok-free.app/api/Chat/${id}`).then(response => {
+    axios.delete(`${API_BASE_URL}/api/Chat/${id}`).then(response => {
       if (response.data.Success) {
         console.log("Left chat:", id);
         let updatedChats = userRef.current.chats.filter(chat => chat.id !== id);
@@ -414,7 +415,6 @@ function Interface() {
       console.error("Error leaving chat:", error);
     });
   }
-
 
   return (
     <>
