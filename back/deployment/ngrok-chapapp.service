@@ -1,0 +1,19 @@
+[Unit]
+Description=Ngrok Tunnel for Chat Application
+After=network.target
+Requires=chapplication.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/ngrok start --all --log stdout
+WorkingDirectory=/opt/chapplication/
+User=root
+Group=root
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=ngrok-chapapp
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

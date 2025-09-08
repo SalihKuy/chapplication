@@ -15,7 +15,7 @@ public class EmailAuthService : IEmailAuthService
     {
         _SenderEmail = configuration["EmailSettings:Username"];
         _SenderPassword = configuration["EmailSettings:Password"];
-        if(string.IsNullOrEmpty(_SenderEmail) || string.IsNullOrEmpty(_SenderPassword))
+        if (string.IsNullOrEmpty(_SenderEmail) || string.IsNullOrEmpty(_SenderPassword))
         {
             throw new Exception("Email settings not found in appsettings.json");
         }
@@ -25,12 +25,16 @@ public class EmailAuthService : IEmailAuthService
     {
         byte[] randomBytes = new byte[32];
         RandomNumberGenerator.Fill(randomBytes);
-        return Convert.ToBase64String(randomBytes);
+        return Convert.ToBase64String(randomBytes)
+            .Replace("/", "_")
+            .Replace("+", "-")
+            .Replace("=", "");
     }
 
     public bool SendVerificationEmail(string to, string verificationToken)
     {
-        string verificationLink = $"{VerificationBaseUrl}?token={verificationToken}";
+        string encodedToken = WebUtility.UrlEncode(verificationToken);
+        string verificationLink = $"{VerificationBaseUrl}?token={encodedToken}";
         string subject = "Verify Your Email Address";
         string body = $@"
 Dear User,
@@ -57,7 +61,7 @@ Chapplication.
                 Credentials = new NetworkCredential(_SenderEmail, _SenderPassword),
                 EnableSsl = true,
             };
-            if(string.IsNullOrEmpty(_SenderEmail) || string.IsNullOrEmpty(_SenderPassword))
+            if (string.IsNullOrEmpty(_SenderEmail) || string.IsNullOrEmpty(_SenderPassword))
             {
                 throw new Exception("Email settings not found in appsettings.json");
             }

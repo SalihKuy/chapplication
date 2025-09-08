@@ -16,7 +16,7 @@ const VerifyEmail = () => {
 
   const verifyEmail = async (token) => {
     try {
-      const response = await fetch(`https://dockerchat-production.up.railway.app/Auth/verify-email?token=${token}`);
+      const response = await fetch(`https://6af11eca01f3.ngrok-free.app/Auth/verify-email?token=${token}`);
       const data = await response.json();
       if (data.success) {
         setMessage("Email verified successfully!");

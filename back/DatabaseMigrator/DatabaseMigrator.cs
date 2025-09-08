@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 public static class DatabaseMigrator
 
 {
-
     public static IApplicationBuilder MigrateDatabase(this IApplicationBuilder app)
 
     {

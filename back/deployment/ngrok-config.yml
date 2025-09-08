@@ -1,0 +1,18 @@
+version: "3"
+agent:
+    authtoken: 2fMcs58zCjWkbKEDZem7McIyzFL_3D3KAHx4zqG8tBHyfWy95
+
+tunnels:
+  existing-service:
+    proto: http
+    addr: 8080
+    request_header:
+      add:
+        - "ngrok-skip-browser-warning:any"
+  
+  chapapp:
+    proto: http  
+    addr: 5001
+    request_header:
+      add:
+        - "ngrok-skip-browser-warning:any"

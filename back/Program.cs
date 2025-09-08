@@ -23,8 +23,7 @@ using System.Text.Json.Serialization;
 
 Console.WriteLine("Creating builder");
 var builder = WebApplication.CreateBuilder(args);
-Console.WriteLine("Adding Configuration");
-builder.Configuration.AddEnvironmentVariables();
+
 Console.WriteLine("Adding Controllers");
 builder.Services.AddControllers();
 Console.WriteLine("Adding EndpointsApiExplorer");
@@ -40,15 +39,17 @@ builder.Services.AddSwaggerGen(c => {
     c.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
-Console.WriteLine("Adding Cors");
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost", builder =>
     {
-        builder.WithOrigins("https://chapplication.netlify.app")
-               .AllowAnyHeader()
-               .AllowAnyMethod()
-               .AllowCredentials();
+        builder
+            .WithOrigins("https://chapplication.netlify.app")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .SetIsOriginAllowed(_ => true);
     });
 });
 
@@ -60,10 +61,10 @@ Console.WriteLine("Adding Chat Service");
 builder.Services.AddScoped<IChatService, ChatService>();
 Console.WriteLine("Adding Message Service");
 builder.Services.AddScoped<IMessageService, MessageService>();
-Console.WriteLine("Adding Auth Repository");
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 Console.WriteLine("Adding Email Auth Service");
 builder.Services.AddScoped<IEmailAuthService, EmailAuthService>();
+Console.WriteLine("Adding Auth Repository");
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 Console.WriteLine("Adding DBContext");
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

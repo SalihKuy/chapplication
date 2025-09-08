@@ -1,0 +1,57 @@
+# Root-level gitignore for the entire chapplication project
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Local development
+local.settings.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets and keys
+secrets/
+keys/
+certificates/
+
+# Docker
+docker-compose.override.yml
+
+# IDE specific
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
