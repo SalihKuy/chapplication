@@ -1,20 +1,25 @@
-import { useState } from "react"
-import axios from "axios"
+import { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "./config.js";
+import "./Auth.css";
 
-function Login() {
+function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     function handleRegister(e) {
         e.preventDefault();
+        setIsLoading(true);
+        setErrorMessage("");
 
         if (!username || !email || !password) {
             setErrorMessage("All fields are required");
+            setIsLoading(false);
             return;
         }
     
@@ -28,7 +33,7 @@ function Login() {
             }
         })
         .then(response => {
-            if (response.data.Success === true) {
+            if (response.data.success === true) {
                 console.log("Register successful:", response.data);
                 navigate("/Interface");
             }
@@ -54,41 +59,84 @@ function Login() {
             } else {
                 setErrorMessage("Network error. Please check your connection.");
             }
+        })
+        .finally(() => {
+            setIsLoading(false);
         });
     }
 
-    
-
     return (
-        <>
-            <div style={{ display: "grid", gridTemplateRows: "repeat(10, 1fr)", gridTemplateColumns: "repeat(15, 1fr)", height: "100vh", width: "100vw", backgroundColor:"#333333"}}>
-                <div style={{ display: "flex", flexDirection: "column", gridColumnStart: "4", gridColumnEnd: "8", gridRowStart: "2", gridRowEnd: "10", backgroundColor: "#444444", borderRadius: "5%" }}>
-                    <div style={{ flex: "2", display: "flex", justifyContent: "center", alignItems: "center" }}></div>
-                    <p style={{ flex: "1", textAlign: "center", fontSize: "2em", color:"#FFFFFF" }}>Register</p>
-                    <form style={{ flex: "10", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }} onSubmit={handleRegister}>
-                        <div style={{ flex: "1", display: "flex", justifyContent: "center", alignItems: "center" }}></div>
-                        <input onChange={(e) => setUsername(e.target.value)} type="text" placeholder="Username" style={{ margin: "10px", width: "200px", height: "30px", backgroundColor:"#222222", color:"#DDDDDD"}}></input>
-                        <div style={{ flex: "0.01", display: "flex", justifyContent: "center", alignItems: "center" }}></div>
-                        <input onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email" style={{ margin: "10px", width:"200px", height:"30px", backgroundColor:"#222222", color:"#DDDDDD"}}></input>
-                        <div style={{ flex: "0.01", display: "flex", justifyContent: "center", alignItems: "center" }}></div>
-                        <input onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Password" style={{ margin:"10px", width:"200px", height:"30px", backgroundColor:"#222222", color:"#DDDDDD"}}></input>
-                        <div style={{ flex: "0.2", display: "flex", justifyContent: "center", alignItems: "center" }}></div>
-                        <button onClick={handleRegister} style={{ width: "200px", height: "30px", borderRadius: "15px", backgroundColor:"#111111", color:"#DDDDDD"}}>Register</button>
-                        <div style={{ flex: "0.1", display: "flex", justifyContent: "center", alignItems: "center" }}></div>
-                        <div style={{ display: "flex", flexDirection: "column", flex: "3" }}>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", flex: "3" }}>
-                                <p style={{ margin: "0", marginRight: "5px", marginTop: "5px", color:"#EEEEEE" }}>Already a member?</p>
-                                <a href="/login" style={{ textDecoration: "none", marginTop: "5px", color:"#301934"}}>Log in</a>
-                            </div>
-                            <div style={{ flex: "10", justifyContent: "center", alignItems: "center" }}></div>
+        <div className="auth-container">
+            <div className="auth-card">
+                <div className="auth-header">
+                    <h1 className="auth-title">Join Us</h1>
+                    <p className="auth-subtitle">Create your account to get started</p>
+                </div>
+                
+                <form className="auth-form" onSubmit={handleRegister}>
+                    <div className="form-group">
+                        <input 
+                            className="form-input"
+                            type="text" 
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <input 
+                            className="form-input"
+                            type="email" 
+                            placeholder="Email address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <input 
+                            className="form-input"
+                            type="password" 
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    
+                    <button 
+                        type="submit" 
+                        className={`auth-button ${isLoading ? 'loading' : ''}`}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? '' : 'Create Account'}
+                    </button>
+                    
+                    {errorMessage && (
+                        <div className="error-message">
+                            {errorMessage}
                         </div>
-                        <p style={{flex:"2", color: "#FFFFFF" }}>Please check your email&apos;s spam folder after registering.</p>
-                        {errorMessage && <p style={{flex:"2", color: "red" }}>{errorMessage}</p>}
-                    </form>
+                    )}
+                </form>
+                
+                <div className="info-text">
+                    Please check your email&apos;s spam folder after registering.
+                </div>
+                
+                <div className="auth-footer">
+                    <p>
+                        Already have an account? {' '}
+                        <a href="/login" className="auth-link">
+                            Sign in here
+                        </a>
+                    </p>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 
-export default Login
+export default Register;

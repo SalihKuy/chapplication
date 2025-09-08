@@ -1,0 +1,26 @@
+/* App-level styles */
+.App {
+  text-align: center;
+}
+
+/* Toast customization */
+.Toastify__toast {
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.Toastify__progress-bar {
+  background: rgba(255, 255, 255, 0.7);
+}

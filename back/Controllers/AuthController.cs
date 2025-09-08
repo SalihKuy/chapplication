@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace back.Controllers
 {
     [ApiController]
-    [Route("ch/[controller]")]
+    [Route("[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepository;

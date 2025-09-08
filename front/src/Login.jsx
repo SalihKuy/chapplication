@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "./config.js";
+import "./Auth.css";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,20 +20,22 @@ function Login() {
                 }
             })
             .then(response => {
-                if (response.data.Success === true) {
+                if (response.data.success === true) {
                     console.log("Token is valid:", response.data);
                     navigate("/Interface");
                 }
             })
             .catch(error => {
                 console.log(error);
-            }
-            );
+            });
         }
     }, [navigate]);
 
     function handleLogin(e) {
         e.preventDefault();
+        setIsLoading(true);
+        setErrorMessage("");
+
         axios.post(`${API_BASE_URL}/Auth/Login`, {
             Email: email,
             password: password
@@ -42,14 +46,14 @@ function Login() {
         })
         .then(response => {
             console.log("Login response:", response.data);
-            if (response.data.Success === true) {
-                console.log("Login successful:", response.data.Data);
-                localStorage.setItem("token", response.data.Data.token);
-                localStorage.setItem("id", response.data.Data.id);
+            if (response.data.success === true) {
+                console.log("Login successful:", response.data.data);
+                localStorage.setItem("token", response.data.data.token);
+                localStorage.setItem("id", response.data.data.id);
                 navigate("/Interface");
             } else {
-                console.log("Login failed:", response.data.Message);
-                setErrorMessage(response.data.Message || "Login failed");
+                console.log("Login failed:", response.data.message);
+                setErrorMessage(response.data.message || "Login failed");
             }
         })
         .catch(error => {
@@ -59,8 +63,7 @@ function Login() {
                     const message = error.response.data.Message || error.response.data.message;
                     if (message === "User not found." || message === "Wrong password.") {
                         setErrorMessage("Invalid email or password");
-                    }
-                    else if(message === "Email not verified. Please check your email for the verification link.") {
+                    } else if(message === "Email not verified. Please check your email for the verification link.") {
                         setErrorMessage(message);
                     } else {
                         setErrorMessage(message || "Login failed");
@@ -71,35 +74,68 @@ function Login() {
             } else {
                 setErrorMessage("Network error occurred");
             }
+        })
+        .finally(() => {
+            setIsLoading(false);
         });
     }
 
     return (
-        <>
-            <div style={{display:"grid", gridTemplateRows: "repeat(10, 1fr)", gridTemplateColumns: "repeat(15, 1fr)", height: "100vh", width: "100vw", backgroundColor:"#333333"}}>
-                <div style={{display:"flex", flexDirection:"column", gridColumnStart: "4", gridColumnEnd: "8", gridRowStart: "2", gridRowEnd: "10", backgroundColor: "#444444", borderRadius:"5%"}}>
-                    <div style={{flex:"2", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
-                    <p style={{flex:"1", textAlign:"center",  fontSize:"2em", color:"#FFFFFF"}}>Login</p>
-                    <form style={{flex:"10", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center"}} onSubmit={handleLogin}>
-                        <div style={{flex:"1", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
-                        <input onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email" style={{flex:"0.7", margin:"10px", width:"200px", height:"30px", backgroundColor:"#222222", color:"#DDDDDD"}}></input>
-                        <div style={{flex:"0.3", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
-                        <input onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Password" style={{flex:"0.7", margin:"10px", width:"200px", height:"30px", backgroundColor:"#222222", color:"#DDDDDD"}}></input>
-                        <div style={{flex:"0.3", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
-                        <button type="submit" style={{width:"200px", height:"30px", borderRadius:"15px", backgroundColor:"#111111", color:"#DDDDDD", flex:"0.6"}}>Login</button>
-                        <div style={{flex:"0.1", display:"flex", justifyContent:"center", alignItems:"center"}}></div>
-                        <div style={{display:"flex", flexDirection:"column", flex:"3"}}>
-                            <div style={{display:"flex", alignItems:"center", justifyContent:"center", width:"100%", flex:"3"}}>
-                                <p style={{margin:"0", marginRight:"5px", marginTop:"5px", color:"#EEEEEE"}}>Don&apos;t have an account?</p>
-                                <a href="/register" style={{textDecoration: "none", marginTop:"5px", color:"#301934"}}>Register</a>
-                            </div>
-                            <div style={{flex:"10", justifyContent:"center", alignItems:"center"}}></div>
+        <div className="auth-container">
+            <div className="auth-card">
+                <div className="auth-header">
+                    <h1 className="auth-title">Welcome Back</h1>
+                    <p className="auth-subtitle">Sign in to your account</p>
+                </div>
+                
+                <form className="auth-form" onSubmit={handleLogin}>
+                    <div className="form-group">
+                        <input 
+                            className="form-input"
+                            type="email" 
+                            placeholder="Email address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <input 
+                            className="form-input"
+                            type="password" 
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    
+                    <button 
+                        type="submit" 
+                        className={`auth-button ${isLoading ? 'loading' : ''}`}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? '' : 'Sign In'}
+                    </button>
+                    
+                    {errorMessage && (
+                        <div className="error-message">
+                            {errorMessage}
                         </div>
-                        {errorMessage && <p style={{flex:"2", color:"red"}}>{errorMessage}</p>}
-                    </form>
+                    )}
+                </form>
+                
+                <div className="auth-footer">
+                    <p>
+                        Don&apos;t have an account? {' '}
+                        <a href="/register" className="auth-link">
+                            Create one here
+                        </a>
+                    </p>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 

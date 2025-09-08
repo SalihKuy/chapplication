@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import PropTypes from "prop-types";
 import logoutImg from "./assets/logout.png";
 import API_BASE_URL from "./config.js";
+import "./Interface.css";
 
 function Interface() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,6 +15,8 @@ function Interface() {
   const [activeChat, setActiveChat] = useState(null);
   const [connection, setConnection] = useState(null);
   const [isUserLoaded, setIsUserLoaded] = useState(false);
+  const [messageInput, setMessageInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -21,16 +24,17 @@ function Interface() {
   const userRef = useRef(null);
 
   const CustomCloseButton = ({ closeToast }) => (
-    <button onClick={closeToast} style={{ color: "#DDDDDD", position: "absolute", top: "10px", right: "10px", background: "transparent", border: "none", fontSize: "16px", cursor: "pointer" }}>
-      ✖
+    <button onClick={closeToast} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+      ✕
     </button>
   );
 
+  CustomCloseButton.propTypes = {
+    closeToast: PropTypes.func.isRequired,
+  };
   useEffect(() => {
     async function fetchUser() {
       try {
-        console.log("getting user");
-        console.log("User ID: ", localStorage.getItem("id"));
         const userId = localStorage.getItem("id");
         const response = await axios.get(`${API_BASE_URL}/api/User/${userId}`, {
           headers: {
@@ -39,14 +43,11 @@ function Interface() {
           }
         });
 
-        if (response.data.Success === true) {
-          console.log("User retrieval successful:", response.data.Data);
-          userRef.current = response.data.Data;
+        if (response.data.success === true) {
+          userRef.current = response.data.data;
 
           if (userRef.current) {
             setIsLoggedIn(true);
-            console.log("User is logged in:", userRef.current);
-
             setChats(sortChats(userRef.current.chats) || []);
           } else {
             setIsLoggedIn(false);
@@ -63,7 +64,6 @@ function Interface() {
 
   useEffect(() => {
     if (activeChat) {
-      console.log("Active chat recentmessages: ", activeChat.recentMessages);
       scrollToBottom();
     }
   }, [activeChat]);
@@ -76,7 +76,6 @@ function Interface() {
 
   const startSignalRConnection = useCallback(async () => {
     try {
-      console.log("startSignalRConnection:" + connection);
       if (connection) {
         await connection.start();
         console.log("SignalR Connected");
@@ -91,8 +90,6 @@ function Interface() {
 
     async function fetchUser() {
       try {
-        console.log("getting user");
-        console.log("User ID: ", localStorage.getItem("id"));
         const userId = localStorage.getItem("id");
         const response = await axios.get(`${API_BASE_URL}/api/User/${userId}`, {
           headers: {
@@ -101,14 +98,11 @@ function Interface() {
           }
         });
 
-        if (response.data.Success === true) {
-          console.log("User retrieval successful:", response.data.Data);
-          userRef.current = response.data.Data;
+        if (response.data.success === true) {
+          userRef.current = response.data.data;
 
           if (userRef.current) {
             setIsLoggedIn(true);
-            console.log("User is logged in:", userRef.current);
-
             setChats(sortChats(userRef.current.chats) || []);
           } else {
             setIsLoggedIn(false);
@@ -127,25 +121,18 @@ function Interface() {
       .build();
 
     setConnection(connection);
-    console.log("setConnection: ", connection);
 
     connection.on("ReceiveMessage", (userId, message) => {
       if (userId === "2147483647") {
         fetchUser();
       }
-      console.log("Received message:", message, "from user:", userId);
-      console.log("isEqual: " + (userRef.current.id === userId));
-      console.log("isEqual2: " + (userId === userRef.current.id && activeChat && activeChat.id === message.ChatId));
-      console.log("user.id: " + userRef.current.id);
 
       if (userId === userRef.current.id && activeChat && activeChat.id === message.ChatId) {
         return;
-      }
-      else if (!activeChat) {
+      } else if (!activeChat) {
         let updatedChats = userRef.current.chats.map(chat => {
           if (chat.id === message.ChatId) {
             const updatedChat = { ...chat };
-
             updatedChat.recentMessages = [...chat.recentMessages, {
               id: message.Id,
               chatId: message.ChatId,
@@ -153,7 +140,6 @@ function Interface() {
               date: message.Date,
               userId: message.UserId
             }];
-
             return updatedChat;
           }
           return chat;
@@ -161,12 +147,10 @@ function Interface() {
         updatedChats = sortChats(updatedChats);
         setChats(updatedChats);
         return;
-      }
-      else if (userId !== userRef.current.id && activeChat && activeChat.id !== message.ChatId) {
+      } else if (userId !== userRef.current.id && activeChat && activeChat.id !== message.ChatId) {
         let updatedChats = userRef.current.chats.map(chat => {
           if (chat.id === message.ChatId) {
             const updatedChat = { ...chat };
-
             updatedChat.recentMessages = [...chat.recentMessages, {
               id: message.Id,
               chatId: message.ChatId,
@@ -174,7 +158,6 @@ function Interface() {
               date: message.Date,
               userId: message.UserId
             }];
-
             return updatedChat;
           }
           return chat;
@@ -185,9 +168,6 @@ function Interface() {
       }
 
       setActiveChat(prevChat => {
-        console.log("PrevChat: ", prevChat);
-        console.log("Message.chatId: ", message.ChatId);
-        console.log("PrevChat.id: ", prevChat.id);
         let newmessage = {
           id: message.Id,
           chatId: message.ChatId,
@@ -196,9 +176,7 @@ function Interface() {
           userId: message.UserId
         }
         if (prevChat && prevChat.id === message.ChatId) {
-          console.log("Updating chat with new message");
           const updatedMessages = [...prevChat.recentMessages, newmessage];
-          console.log("Updated Messages:", updatedMessages);
           return {
             ...prevChat,
             recentMessages: updatedMessages
@@ -214,11 +192,9 @@ function Interface() {
           chats.forEach(chat => {
             connection.invoke("JoinChatGroup", chat.id.toString())
               .catch(err => console.error("Error joining group:", err.toString()));
-            console.log("Joining chat group: ", chat.id);
           });
           connection.invoke("JoinChatGroup", "2147483647")
             .catch(err => console.error("Error joining group:", err.toString()));
-          console.log("Joining chat group: ", "2147483647");
         }
       }
     ).catch(err => console.error("Connection failed: ", err));
@@ -231,7 +207,6 @@ function Interface() {
   useEffect(() => {
     if (connection) {
       if (connection.state === signalR.HubConnectionState.Disconnected) {
-        console.log("Connection is disconnected, starting connection");
         startSignalRConnection();
       }
     }
@@ -241,12 +216,10 @@ function Interface() {
     const ch = chats.find(chat => chat.id === chatId);
     if (userRef.current.id === ch.recentMessages[ch.recentMessages.length - 1].userId) {
       return userRef.current.name;
-    }
-    else {
+    } else {
       if (ch.name.split(" ")[0] === userRef.current.name) {
         return ch.name.split(" ")[2];
-      }
-      else {
+      } else {
         return ch.name.split(" ")[0];
       }
     }
@@ -273,7 +246,6 @@ function Interface() {
     const day = date.getDate();
     const hours = date.getHours();
     const minutes = date.getMinutes();
-
     return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
   }
 
@@ -286,7 +258,6 @@ function Interface() {
     setTimeout(() => {
       setIsChatOpen(true);
       setActiveChat(chat);
-      console.log("Opening chat:", chat);
       scrollToBottom();
     }, 0);
   }
@@ -297,9 +268,8 @@ function Interface() {
       return;
     }
 
+    setIsLoading(true);
     const userId = userRef.current.id;
-    console.log("UserID: ", userId);
-    console.log("Getting chat for user:", userRef.current);
 
     axios.post(`${API_BASE_URL}/api/Chat?userId=${userId}`, {}, {
       headers: {
@@ -307,25 +277,25 @@ function Interface() {
       }
     })
       .then(response => {
-        console.log("Matched chat:", response.data);
-        if (response.data && response.data.Success) {
-          const chat = response.data.Data;
+        if (response.data && response.data.success) {
+          const chat = response.data.data;
           setChats(prevChats => [...prevChats, chat]);
           userRef.current.chats = [...chats, chat];
-        }
-        else {
+        } else {
           console.error("Invalid chat data received:", response.data);
         }
       })
       .catch(error => {
         if (error.response && error.response.data && error.response.data.message === "Chat already exists") {
           toast.info("You are already looking for a new chat, please wait until you are matched with someone.", {
-            style: { backgroundColor: "#222222", color: "#DDDDDD" },
-            closeButton: <CustomCloseButton />
+            style: { backgroundColor: "#667eea", color: "white" }
           });
         } else {
           console.error("Error fetching chat:", error);
         }
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }
 
@@ -340,27 +310,22 @@ function Interface() {
 
   function handleSend(e) {
     e.preventDefault();
-    const messageInput = e.target[1].value;
-    if (messageInput === "") return;
-    console.log("Sending message");
-    console.log("User ID: ", userRef.current.id);
-    console.log(activeChat);
-    console.log(userRef.current);
+    if (messageInput.trim() === "") return;
+    
+    setIsLoading(true);
     const newMessage = { Content: messageInput, ChatId: activeChat.id, UserId: userRef.current.id };
-    console.log(newMessage);
+    
     axios.post(`${API_BASE_URL}/api/Message`, newMessage, {
       headers: {
         'ngrok-skip-browser-warning': 'true'
       }
     })
       .then(response => {
-        console.log("Message sent:", response.data);
-        console.log(activeChat);
         let updatedChats = userRef.current.chats.map(chat => {
           if (chat.id === activeChat.id) {
             return {
               ...chat,
-              recentMessages: response.data.Data.recentMessages || []
+              recentMessages: response.data.data.recentMessages || []
             };
           }
           return chat;
@@ -369,18 +334,19 @@ function Interface() {
         setChats(updatedChats);
         userRef.current.chats = updatedChats;
         setActiveChat(userRef.current.chats.find(chat => chat.id === activeChat.id));
-        e.target[1].value = "";
+        setMessageInput("");
         scrollToBottom();
       })
       .catch(error => {
         console.error("Error sending message:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }
 
   function getMoreMessages(e) {
     e.preventDefault();
-    console.log("Getting more messages");
-
     previousScrollHeightRef.current = chatContainerRef.current.scrollHeight;
 
     axios.get(`${API_BASE_URL}/api/Message`, { 
@@ -390,16 +356,14 @@ function Interface() {
       }
     })
       .then(response => {
-        console.log(activeChat);
-        if (response.data.Data.recentMessages.length === 0) {
+        if (response.data.data.recentMessages.length === 0) {
           return;
         }
 
         let updatedChats = userRef.current.chats.map(chat => {
           if (chat.id === activeChat.id) {
             const existingMessages = chat.recentMessages || [];
-            const newMessages = response.data.Data.recentMessages || [];
-
+            const newMessages = response.data.data.recentMessages || [];
             return {
               ...chat,
               recentMessages: [...newMessages, ...existingMessages]
@@ -419,8 +383,7 @@ function Interface() {
 
   function handleLeave(id) {
     axios.delete(`${API_BASE_URL}/api/Chat/${id}`).then(response => {
-      if (response.data.Success) {
-        console.log("Left chat:", id);
+      if (response.data.success) {
         let updatedChats = userRef.current.chats.filter(chat => chat.id !== id);
         setChats(sortChats(updatedChats));
         userRef.current.chats = updatedChats;
@@ -431,88 +394,138 @@ function Interface() {
     });
   }
 
+  function handleLogout() {
+    setIsLoggedIn(false);
+    localStorage.clear();
+    window.location.reload();
+  }
+
   return (
     <>
-      <style>
-        {`
-          html, body {
-            overflow-x: hidden;
-          }
-        `}
-      </style>
       <ToastContainer position="top-right" autoClose={5000} />
+      
       {!isLoggedIn && (
-        <>
-          <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.5)", zIndex: 999 }}></div>
-          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", backgroundColor: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", zIndex: 1000 }}>
-            <h1>You are not logged in</h1>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", flex: "3" }}>
-              <p style={{ margin: "0", marginRight: "5px", marginTop: "5px" }}>Please </p>
-              <a href="/login" style={{ textDecoration: "none", marginTop: "5px" }}>Log in </a>
-              <p style={{ margin: "0", marginLeft: "5px", marginTop: "5px" }}>to access your chats</p>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h1 className="modal-title">Not Logged In</h1>
+            <p className="modal-text">
+              Please <a href="/login" className="modal-link">log in</a> to access your chats
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="interface-container">
+        <div className="sidebar">
+          <div className="sidebar-header">
+            <h1 className="sidebar-title">Messages</h1>
+            <div className="sidebar-controls">
+              <button 
+                className="btn-find-chat" 
+                onClick={getChat}
+                disabled={isLoading}
+              >
+                {isLoading ? <div className="loading-spinner"></div> : "Find Chat"}
+              </button>
+              <button className="btn-logout" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           </div>
-        </>
-      )}
-      <div style={{ backgroundColor: "#222831", display: "grid", gridTemplateRows: "repeat(10, 1fr)", gridTemplateColumns: "repeat(15, 1fr)", height: "100vh", width: "100vw" }}>
-        <div style={{ gridColumnStart: "1", gridColumnEnd: "16", gridRowStart: "1", gridRowEnd: "11", backgroundColor: "#222831", borderRadius: "20px", display: "flex" }}>
-          <div onClick={handleClose} style={{ flex: "3", backgroundColor: "#1e1e1e", borderRadius: "20px", overflowY: "auto", height: "100%", overflowX: "hidden" }}>
+          
+          <div className="chat-list">
             {chats.map(chat => (
-              <div key={chat.id} style={{ display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "flex-start", borderBottom: "1px solid #000", backgroundColor: "#414141", borderRadius: "20px", border: "2px solid black", transition: "background-color 0.3s ease" }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#616161"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#414141"} onClick={(e) => handleOpen(chat, e)}>
-                <div style={{ display: "flex", color: "#CCCCCC", alignSelf: "flex-start", marginBottom: "10%", marginTop: "5%", marginLeft: "5%", width: "100%" }}>
-                  <div style={{color:"#FFFFFF", flex: "2" }}>{chat.name}</div>
-                  <div style={{color:"#FFFFFF", flex: "3", textAlign: "right", marginRight: "10%" }}>  {chat.recentMessages.length > 0 ? formatDate(chat.recentMessages[chat.recentMessages.length - 1].date) : ""}</div>
+              <div 
+                key={chat.id} 
+                className="chat-item"
+                onClick={(e) => handleOpen(chat, e)}
+              >
+                <div className="chat-header">
+                  <div className="chat-name">{chat.name}</div>
+                  <div className="chat-date">
+                    {chat.recentMessages.length > 0 ? formatDate(chat.recentMessages[chat.recentMessages.length - 1].date) : ""}
+                  </div>
                 </div>
-                <div style={{ color: "#CCCCCC", marginBottom: "5%", marginLeft: "5%" }}>
+                <div className="chat-preview">
                   {chat.recentMessages && chat.recentMessages.length > 0 ? (
                     chat.recentMessages[chat.recentMessages.length - 1].content.length > 30 ?
                       getName(chat.id) + ": " + chat.recentMessages[chat.recentMessages.length - 1].content.substring(0, 29 - getName(chat.id).length) + "..." :
                       getName(chat.id) + ": " + chat.recentMessages[chat.recentMessages.length - 1].content
-                  ) : ""}
+                  ) : "No messages yet"}
                 </div>
               </div>
             ))}
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "15%", borderBottom: "1px solid #000", backgroundColor: "#414141", borderRadius: "20px", border: "2px solid black", }}>
-              <button onClick={getChat} style={{ width: "50%", height: "50%", backgroundColor: "#111111", color: "#DDDDDD", borderRadius: "10px" }}>Find a new chat</button>
-              <button onClick={() => {setIsLoggedIn(false); localStorage.clear(); window.location.reload(); }} style={{ width: "50%", height: "50%", backgroundColor: "#6B0000", color: "#DDDDDD", borderRadius: "10px" }}>Log out</button>
-            </div>
           </div>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flex: "9", backgroundColor: "#161717", borderRadius: "20px" }}>
-            {!isChatOpen && (
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#161717", width: "30%", height: "30%", borderRadius: "10px" }}>
-                <button onClick={getChat} style={{ width: "50%", height: "50%", backgroundColor: "#111111", color: "#DDDDDD", borderRadius: "10px" }}>Find a new chat</button>
+        </div>
+
+        <div className="main-chat">
+          {!isChatOpen ? (
+            <div className="welcome-screen">
+              <h1 className="welcome-title">Welcome to Chat</h1>
+              <p className="welcome-subtitle">Select a conversation or start a new one</p>
+              <button 
+                className="btn-start-chat" 
+                onClick={getChat}
+                disabled={isLoading}
+              >
+                {isLoading ? <div className="loading-spinner"></div> : "Start New Chat"}
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="chat-header-bar">
+                <div className="chat-header-title">{activeChat.name}</div>
+                <button 
+                  className="btn-leave-chat" 
+                  onClick={() => handleLeave(activeChat.id)}
+                >
+                  <img src={logoutImg} alt="Leave" className="logout-icon" />
+                  Leave
+                </button>
               </div>
-            )}
-            {isChatOpen && (
-              <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
-                <div style={{ display: "flex", flexDirection: "column", flex: "15", backgroundColor: "#161717", borderRadius: "20px", border: "2px solid gray", width: "100%", overflowY: "auto", overflowX: "hidden" }}>
-                  <div style={{ display: "flex", flex: "0.7" }}>
-                    <div style={{ height: "100%", display: "flex", justifyContent: "flex-start", paddingLeft: "10px", alignItems: "center", backgroundColor: "#161717", color: "#DDDDDD", width: "100%", }}>{activeChat.name}</div>
-                    <button onClick={() => { handleLeave(activeChat.id); }} style={{ height: "70%", width: "3%", borderRadius: "10px", marginRight: "20px", marginTop: "5px", backgroundColor: "#222222", color: "#DDDDDD" }}><img src={logoutImg} alt="Logout" style={{ height: "100%", width: "100%", objectFit: "contain" }} /></button>
+
+              <div 
+                className="messages-container"
+                ref={chatContainerRef}
+                onScroll={handleTopScroll}
+              >
+                {activeChat && activeChat.recentMessages && activeChat.recentMessages.map(message => (
+                  <div 
+                    key={message.id} 
+                    className={`message ${message.userId === userRef.current.id ? 'own' : 'other'}`}
+                  >
+                    <p className="message-content">{message.content}</p>
+                    <span className="message-time">{formatDate(message.date)}</span>
                   </div>
-                  {activeChat && activeChat.recentMessages && (
-                    <div ref={chatContainerRef} onScroll={(event) => handleTopScroll(event)} style={{ display: "flex", flexDirection: "column", flex: "9", backgroundColor: "#161717", borderRadius: "20px", border: "2px solid gray", width: "100%", overflowY: "auto" }}>
-                      {activeChat.recentMessages.map(message => (
-                        <div key={message.id} style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", padding: "15px", borderBottom: "1px solid #000", backgroundColor: message.userId === userRef.current.id ? "#020202" : "#222222", borderRadius: "20px", border: "2px solid gray", width: "30%", alignSelf: message.userId === userRef.current.id ? "flex-end" : "flex-start" }}>
-                          <p style={{ color: "#DDDDDD", flex: "1", wordWrap: "break-word", whiteSpace: "pre-wrap", width: "100%", overflowWrap: "break-word", wordBreak: "break-word" }}>
-                            {message.content}
-                          </p>
-                          <p style={{ color: "#DDDDDD", flex: "1", fontSize: "30%", textAlign: "left", width: "100%" }}>
-                            {formatDate(message.date)}
-                          </p>
-                        </div>
-                      ))}
-                      <div ref={messagesEndRef} />
-                    </div>
-                  )}
-                </div>
-                <form onSubmit={handleSend} style={{ flex: "1", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#282829", borderRadius: "20px", border: "2px solid gray" }}>
-                  <button type="submit" style={{ flex: "1", borderRadius: "20px", backgroundColor: "#313131", color: "white", height: "60%" }}>Send</button>
-                  <input type="text" style={{ color: "#DDDDDD", flex: "9", borderRadius: "20px", backgroundColor: "#3d3d3e", height: "60%" }} />
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <div className="message-input-container">
+                <form className="message-form" onSubmit={handleSend}>
+                  <textarea
+                    className="message-input"
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                    placeholder="Type your message..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend(e);
+                      }
+                    }}
+                  />
+                  <button 
+                    type="submit" 
+                    className="btn-send"
+                    disabled={isLoading || messageInput.trim() === ""}
+                  >
+                    {isLoading ? <div className="loading-spinner"></div> : "→"}
+                  </button>
                 </form>
               </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
       </div>
     </>
@@ -520,7 +533,7 @@ function Interface() {
 }
 
 Interface.propTypes = {
-  closeToast: PropTypes.func.isRequired,
+  closeToast: PropTypes.func,
 };
 
 export default Interface;
