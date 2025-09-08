@@ -10,7 +10,7 @@ function Login() {
 
     useEffect(() => {
         if (localStorage.getItem("token")) {
-            axios.get("https://6af11eca01f3.ngrok-free.app/Auth/ValidateToken", {
+            axios.get("https://d1acbf1a110a.ngrok-free.app/Auth/ValidateToken", {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -30,7 +30,7 @@ function Login() {
 
     function handleLogin(e) {
         e.preventDefault();
-        axios.post("https://6af11eca01f3.ngrok-free.app/Auth/Login", {
+        axios.post("https://d1acbf1a110a.ngrok-free.app/Auth/Login", {
             Email: email,
             password: password
         })

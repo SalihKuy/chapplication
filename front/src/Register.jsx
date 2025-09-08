@@ -17,7 +17,7 @@ function Login() {
             return;
         }
     
-        axios.post("https://6af11eca01f3.ngrok-free.app/Auth/Register", {
+        axios.post("https://d1acbf1a110a.ngrok-free.app/Auth/Register", {
             Name: username,
             Email: email,
             Password: password

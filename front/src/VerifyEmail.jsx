@@ -16,12 +16,12 @@ const VerifyEmail = () => {
 
   const verifyEmail = async (token) => {
     try {
-      const response = await fetch(`https://6af11eca01f3.ngrok-free.app/Auth/verify-email?token=${token}`);
+      const response = await fetch(`https://d1acbf1a110a.ngrok-free.app/Auth/verify-email?token=${token}`);
       const data = await response.json();
-      if (data.success) {
+      if (data.Success) {
         setMessage("Email verified successfully!");
       } else {
-        setMessage("Email verification failed.");
+        setMessage(`Email verification failed: ${data.Message || "Unknown error"}`);
       }
     } catch (error) {
       setMessage("An error occurred during verification.");
