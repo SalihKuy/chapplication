@@ -34,7 +34,8 @@ function Interface() {
         const userId = localStorage.getItem("id");
         const response = await axios.get(`${API_BASE_URL}/api/User/${userId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            'ngrok-skip-browser-warning': 'true'
           }
         });
 
@@ -95,7 +96,8 @@ function Interface() {
         const userId = localStorage.getItem("id");
         const response = await axios.get(`${API_BASE_URL}/api/User/${userId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            'ngrok-skip-browser-warning': 'true'
           }
         });
 
@@ -299,7 +301,11 @@ function Interface() {
     console.log("UserID: ", userId);
     console.log("Getting chat for user:", userRef.current);
 
-    axios.post(`${API_BASE_URL}/api/Chat?userId=${userId}`)
+    axios.post(`${API_BASE_URL}/api/Chat?userId=${userId}`, {}, {
+      headers: {
+        'ngrok-skip-browser-warning': 'true'
+      }
+    })
       .then(response => {
         console.log("Matched chat:", response.data);
         if (response.data && response.data.Success) {
@@ -342,7 +348,11 @@ function Interface() {
     console.log(userRef.current);
     const newMessage = { Content: messageInput, ChatId: activeChat.id, UserId: userRef.current.id };
     console.log(newMessage);
-    axios.post(`${API_BASE_URL}/api/Message`, newMessage)
+    axios.post(`${API_BASE_URL}/api/Message`, newMessage, {
+      headers: {
+        'ngrok-skip-browser-warning': 'true'
+      }
+    })
       .then(response => {
         console.log("Message sent:", response.data);
         console.log(activeChat);
@@ -373,7 +383,12 @@ function Interface() {
 
     previousScrollHeightRef.current = chatContainerRef.current.scrollHeight;
 
-    axios.get(`${API_BASE_URL}/api/Message`, { params: { id: activeChat.recentMessages[0].id - 1, chatId: activeChat.id, userId: userRef.current.id } })
+    axios.get(`${API_BASE_URL}/api/Message`, { 
+      params: { id: activeChat.recentMessages[0].id - 1, chatId: activeChat.id, userId: userRef.current.id },
+      headers: {
+        'ngrok-skip-browser-warning': 'true'
+      }
+    })
       .then(response => {
         console.log(activeChat);
         if (response.data.Data.recentMessages.length === 0) {

@@ -22,6 +22,10 @@ function Login() {
             Name: username,
             Email: email,
             Password: password
+        }, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
         })
         .then(response => {
             if (response.data.Success === true) {

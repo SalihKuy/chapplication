@@ -19,7 +19,11 @@ const VerifyEmail = () => {
     console.log("Starting email verification with token:", token);
     try {
       console.log("Making fetch request to backend...");
-      const response = await fetch(`${API_BASE_URL}/Auth/verify-email?token=${token}`);
+      const response = await fetch(`${API_BASE_URL}/Auth/verify-email?token=${token}`, {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
       console.log("Response received:", response);
       console.log("Response status:", response.status);
       

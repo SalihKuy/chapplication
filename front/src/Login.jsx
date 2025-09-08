@@ -13,7 +13,8 @@ function Login() {
         if (localStorage.getItem("token")) {
             axios.get(`${API_BASE_URL}/Auth/ValidateToken`, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    'ngrok-skip-browser-warning': 'true'
                 }
             })
             .then(response => {
@@ -34,6 +35,10 @@ function Login() {
         axios.post(`${API_BASE_URL}/Auth/Login`, {
             Email: email,
             password: password
+        }, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
         })
         .then(response => {
             console.log("Login response:", response.data);
