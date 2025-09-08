@@ -76,25 +76,34 @@ namespace back.Data
 
         public async Task<ServiceResponse<bool>> VerifyEmail(string token)
         {
+            Console.WriteLine($"VerifyEmail called with token: {token}");
             var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
             var response = new ServiceResponse<bool>();
 
             if (user == null)
             {
+                Console.WriteLine("User not found for token");
                 response.Success = false;
                 response.Message = "Invalid token.";
                 return response;
             }
 
+            Console.WriteLine($"User found: {user.Email}, EmailConfirmed: {user.EmailConfirmed}");
+
             if (user.EmailConfirmed)
             {
+                Console.WriteLine("Email already verified");
                 response.Success = false;
                 response.Message = "Email already verified.";
                 return response;
             }
 
-            if ((DateTime.UtcNow - user.TokenCreationTime).TotalHours > 24)
+            var timeDiff = DateTime.UtcNow - user.TokenCreationTime;
+            Console.WriteLine($"Token age: {timeDiff.TotalHours} hours");
+
+            if (timeDiff.TotalHours > 24)
             {
+                Console.WriteLine("Token has expired");
                 response.Success = false;
                 response.Message = "Token has expired.";
                 return response;
@@ -104,6 +113,7 @@ namespace back.Data
             user.VerificationToken = null;
             await _context.SaveChangesAsync();
 
+            Console.WriteLine("Email verified successfully");
             response.Success = true;
             response.Data = true;
             response.Message = "Email verified successfully.";

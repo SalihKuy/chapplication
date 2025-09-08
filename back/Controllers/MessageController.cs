@@ -11,7 +11,7 @@ using back.Dtos.Chat;
 namespace back.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("ch/api/[controller]")]
     public class MessageController : ControllerBase
     {
             private readonly IMessageService _messageService;

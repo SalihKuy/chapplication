@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace back.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("ch/api/[controller]")]
     public class ChatController : ControllerBase
     {
         private readonly IChatService _chatService;

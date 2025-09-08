@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace back.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("ch/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepository;
@@ -32,12 +32,25 @@ namespace back.Controllers
         {
             Console.WriteLine("Got the verify email request");
             Console.WriteLine($"Token: {token}");
-            var result = await _authRepository.VerifyEmail(token);
-            if (!result.Success)
+            try
             {
-                return BadRequest(result);
+                var result = await _authRepository.VerifyEmail(token);
+                Console.WriteLine($"VerifyEmail result - Success: {result.Success}, Message: {result.Message}");
+                if (!result.Success)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
             }
-            return Ok(result);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"VerifyEmail error: {ex}");
+                return StatusCode(500, new ServiceResponse<bool> 
+                { 
+                    Success = false, 
+                    Message = "An error occurred during verification" 
+                });
+            }
         }
         [HttpPost("Register")]
         public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegisterDto request)

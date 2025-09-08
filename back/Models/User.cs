@@ -18,7 +18,7 @@ namespace back.Models
         public byte[] Salt { get; set; } = new byte[0];
         public string? VerificationToken { get; set; } = string.Empty;
         public bool EmailConfirmed { get; set; } = false;
-        public DateTime TokenCreationTime { get; set; } = new DateTime();
+        public DateTime TokenCreationTime { get; set; } = DateTime.UtcNow;
 
         public ICollection<UserChat> UserChats { get; set; } = new List<UserChat>();
 

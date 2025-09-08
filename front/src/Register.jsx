@@ -34,14 +34,25 @@ function Login() {
             }
         })
         .catch(error => {
+            console.log("Registration error:", error);
+            console.log("Error response:", error.response);
+            console.log("Error response data:", error.response?.data);
+            
             if (error.response) {
                 if (error.response.status === 400) {
-                    if (error.response.data.Message === "Email already exists.") {
+                    const message = error.response.data?.Message || error.response.data?.message;
+                    if (message === "Email already exists.") {
                         setErrorMessage("Email already exists");
-                    } else if (error.response.data.Message === "Username already exists.") {
+                    } else if (message === "Username already exists.") {
                         setErrorMessage("Username already exists");
+                    } else {
+                        setErrorMessage(message || "Registration failed");
                     }
+                } else {
+                    setErrorMessage("Registration failed. Please try again.");
                 }
+            } else {
+                setErrorMessage("Network error. Please check your connection.");
             }
         });
     }

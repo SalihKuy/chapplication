@@ -113,7 +113,7 @@ app.UseAuthorization();
 Console.WriteLine("Mapping Controllers");
 app.MapControllers();
 Console.WriteLine("Adding SignalR Hub");
-app.MapHub<ChatHub>("/chathub").RequireCors("AllowLocalhost");
+app.MapHub<ChatHub>("/ch/chathub").RequireCors("AllowLocalhost");
 Console.WriteLine("Migrating Database");
 DatabaseMigrator.MigrateDatabase(app);
 
