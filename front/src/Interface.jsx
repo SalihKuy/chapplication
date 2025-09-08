@@ -37,9 +37,9 @@ function Interface() {
           }
         });
 
-        if (response.data.success === true) {
-          console.log("User retrieval successful:", response.data.data);
-          userRef.current = response.data.data;
+        if (response.data.Success === true) {
+          console.log("User retrieval successful:", response.data.Data);
+          userRef.current = response.data.Data;
 
           if (userRef.current) {
             setIsLoggedIn(true);
@@ -98,9 +98,9 @@ function Interface() {
           }
         });
 
-        if (response.data.success === true) {
-          console.log("User retrieval successful:", response.data.data);
-          userRef.current = response.data.data;
+        if (response.data.Success === true) {
+          console.log("User retrieval successful:", response.data.Data);
+          userRef.current = response.data.Data;
 
           if (userRef.current) {
             setIsLoggedIn(true);
@@ -301,8 +301,8 @@ function Interface() {
     axios.post(`https://d1acbf1a110a.ngrok-free.app/api/Chat?userId=${userId}`)
       .then(response => {
         console.log("Matched chat:", response.data);
-        if (response.data && response.data.success) {
-          const chat = response.data.data;
+        if (response.data && response.data.Success) {
+          const chat = response.data.Data;
           setChats(prevChats => [...prevChats, chat]);
           userRef.current.chats = [...chats, chat];
         }
@@ -349,7 +349,7 @@ function Interface() {
           if (chat.id === activeChat.id) {
             return {
               ...chat,
-              recentMessages: response.data.data.recentMessages || []
+              recentMessages: response.data.Data.recentMessages || []
             };
           }
           return chat;
@@ -375,14 +375,14 @@ function Interface() {
     axios.get("https://d1acbf1a110a.ngrok-free.app/api/Message", { params: { id: activeChat.recentMessages[0].id - 1, chatId: activeChat.id, userId: userRef.current.id } })
       .then(response => {
         console.log(activeChat);
-        if (response.data.data.recentMessages.length === 0) {
+        if (response.data.Data.recentMessages.length === 0) {
           return;
         }
 
         let updatedChats = userRef.current.chats.map(chat => {
           if (chat.id === activeChat.id) {
             const existingMessages = chat.recentMessages || [];
-            const newMessages = response.data.data.recentMessages || [];
+            const newMessages = response.data.Data.recentMessages || [];
 
             return {
               ...chat,
@@ -403,7 +403,7 @@ function Interface() {
 
   function handleLeave(id) {
     axios.delete(`https://d1acbf1a110a.ngrok-free.app/api/Chat/${id}`).then(response => {
-      if (response.data.success) {
+      if (response.data.Success) {
         console.log("Left chat:", id);
         let updatedChats = userRef.current.chats.filter(chat => chat.id !== id);
         setChats(sortChats(updatedChats));

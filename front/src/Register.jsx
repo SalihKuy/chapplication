@@ -23,7 +23,7 @@ function Login() {
             Password: password
         })
         .then(response => {
-            if (response.data.success === true) {
+            if (response.data.Success === true) {
                 console.log("Register successful:", response.data);
                 navigate("/Interface");
             }
@@ -31,9 +31,9 @@ function Login() {
         .catch(error => {
             if (error.response) {
                 if (error.response.status === 400) {
-                    if (error.response.data.message === "Email already exists.") {
+                    if (error.response.data.Message === "Email already exists.") {
                         setErrorMessage("Email already exists");
-                    } else if (error.response.data.message === "Username already exists.") {
+                    } else if (error.response.data.Message === "Username already exists.") {
                         setErrorMessage("Username already exists");
                     }
                 }

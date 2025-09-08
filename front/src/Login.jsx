@@ -16,7 +16,7 @@ function Login() {
                 }
             })
             .then(response => {
-                if (response.data.success === true) {
+                if (response.data.Success === true) {
                     console.log("Token is valid:", response.data);
                     navigate("/Interface");
                 }
@@ -35,24 +35,35 @@ function Login() {
             password: password
         })
         .then(response => {
-            if (response.data.success === true) {
-                console.log("Login successful:", response.data.data);
-                localStorage.setItem("token", response.data.data.token);
-                localStorage.setItem("id", response.data.data.id);
+            console.log("Login response:", response.data);
+            if (response.data.Success === true) {
+                console.log("Login successful:", response.data.Data);
+                localStorage.setItem("token", response.data.Data.token);
+                localStorage.setItem("id", response.data.Data.id);
                 navigate("/Interface");
+            } else {
+                console.log("Login failed:", response.data.Message);
+                setErrorMessage(response.data.Message || "Login failed");
             }
         })
         .catch(error => {
-            console.log(error);
+            console.log("Login error:", error);
             if (error.response) {
                 if (error.response.status === 400) {
-                    if (error.response.data.message === "User not found." || error.response.data.message === "Wrong password.") {
+                    const message = error.response.data.Message || error.response.data.message;
+                    if (message === "User not found." || message === "Wrong password.") {
                         setErrorMessage("Invalid email or password");
                     }
-                    else if(error.response.data.message === "Email not verified. Please check your email for the verification link.") {
-                        setErrorMessage(error.response.data.message);
+                    else if(message === "Email not verified. Please check your email for the verification link.") {
+                        setErrorMessage(message);
+                    } else {
+                        setErrorMessage(message || "Login failed");
                     }
+                } else {
+                    setErrorMessage("An error occurred during login");
                 }
+            } else {
+                setErrorMessage("Network error occurred");
             }
         });
     }
